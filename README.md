@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Digital Twin Dashboard
 
-## Getting Started
+## Project Overview
+I developed this project during my internship with the Navy, focuses on building a **Digital Twin dashboard** for controllers operating under protocols such as **DNP3, BACnet, and Modbus**.
 
-First, run the development server:
+The system:
+- Collects and interprets controller data  
+- Analyzes incoming traffic in real time  
+- Presents insights in a user-friendly dashboard  
+- Enables users to test and adjust parameters with flexibility  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+To extend its capabilities, the system integrates a **large language model (LLM)** that analyzes data and generates **predictions for optimal resource usage**. These predictions feed into containerized environments simulating the controllers, enabling traffic analysis and informed decision-making.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Purpose of this Repository
+This repository serves as **living documentation** of the project’s progress.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- The setup is intended to be reproducible, so others can follow along.  
+- The project reflects a **learning-by-doing** approach: I’ll share helpful references as I discover them.  
+- The system will be built in **phases**, starting with a skeleton dashboard and expanding toward a fully integrated architecture.  
+- While I’m starting from the **front end**, others are welcome to approach it differently.  
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
+- **Frontend**: React  
+- **Backend**: Flask (Python)  
+- **AI**: Large Language Models (LLMs)  
+- **Containerization**: Docker, Kubernetes  
+- **Protocols**: DNP3, BACnet, Modbus  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Roadmap
+- [ ] Build a skeleton dashboard for system visualization  
+- [ ] Connect controllers via simulated protocols  
+- [ ] Integrate LLM for predictions  
+- [ ] Add traffic analysis and parameter adjustment features  
+- [ ] Package into reproducible Docker/Kubernetes deployments  
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Collaboration and Support
+If you’ve read this far—thank you, I truly appreciate your time and interest.  
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Got ideas? Contributions and discussions are welcome.  
+- Reach out with questions or suggestions.  
+- This is a work in progress, and updates will be shared along the way.  
