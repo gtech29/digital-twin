@@ -6,26 +6,71 @@ import { useEffect, useRef, useState } from "react";
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null); // restore focus on close
 
-  // Close on Esc
+  // Close on Esc (global)
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
-    }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Body scroll lock + focus move/restore
+  useEffect(() => {
+    document.body.classList.toggle("nav-open", open);
+
+    if (open && panelRef.current) {
+      // Move focus to first focusable in the drawer
+      const first = panelRef.current.querySelector<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"]), summary'
+      );
+      first?.focus();
+    } else if (!open) {
+      // Restore focus to hamburger
+      buttonRef.current?.focus();
+    }
+
+    return () => {
+      document.body.classList.remove("nav-open");
+    };
+  }, [open]);
+
+  // Focus trap inside the drawer
+  function onKeyDownTrap(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== "Tab" || !panelRef.current) return;
+    const focusables = Array.from(
+      panelRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"]), summary'
+      )
+    );
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
   return (
     <>
       {/* Top bar with hamburger on the left */}
-      <header className="nav-topbar">
+      <header className="nav-topbar" role="banner">
         <button
+          ref={buttonRef}
           className="hamburger"
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls="nav-drawer"
-          onClick={() => setOpen(true)}
+          onClick={() => setOpen((v) => !v)}
         >
           {/* Simple hamburger icon */}
           <span />
@@ -33,7 +78,7 @@ export default function Navigation() {
           <span />
         </button>
 
-        <Link href="/" className="brand">
+        <Link href="/" className="brand" aria-label="Digital Twin, home">
           Digital Twin
         </Link>
       </header>
@@ -53,6 +98,7 @@ export default function Navigation() {
         role="dialog"
         aria-modal="true"
         aria-label="Main navigation"
+        onKeyDown={onKeyDownTrap}
       >
         <div className="drawer-header">
           <strong>Menu</strong>
@@ -65,60 +111,18 @@ export default function Navigation() {
           </button>
         </div>
 
-        <nav className="drawer-nav" onClick={() => setOpen(false)}>
+        <nav className="drawer-nav" aria-label="Primary">
           <ul className="menu-root">
             <li>
-              <Link href="/">Home</Link>
-            </li>
-
-            {/* Submenu (Reports) */}
-            <li className="has-sub">
-              <details>
-                <summary>
-                  <span>Reports</span>
-                  <span className="arrow" aria-hidden>
-                    ▸
-                  </span>
-                </summary>
-                <ul className="submenu">
-                  <li>
-                    <Link href="/dashboard/reports">Overview</Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/reports/daily">Daily</Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/reports/monthly">Monthly</Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
-
-            {/* Submenu (Settings) */}
-            <li className="has-sub">
-              <details>
-                <summary>
-                  <span>Settings</span>
-                  <span className="arrow" aria-hidden>
-                    ▸
-                  </span>
-                </summary>
-                <ul className="submenu">
-                  <li>
-                    <Link href="/dashboard/settings">General</Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/settings/users">Users</Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/settings/billing">Billing</Link>
-                  </li>
-                </ul>
-              </details>
+              <Link href="/" onClick={() => setOpen(false)}>
+                Home
+              </Link>
             </li>
 
             <li>
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard" onClick={() => setOpen(false)}>
+                Dashboard
+              </Link>
             </li>
           </ul>
         </nav>

@@ -6,6 +6,17 @@
   --foreground: #171717;
   --font-sans: Arial, Helvetica, sans-serif;
   --font-mono: monospace;
+
+  /* Navbar/hover tokens (tweak to taste) */
+  --hover-bg: #f5f5f5;
+  /* light hover */
+  --hover-bg-dark: #1f2937;
+  /* ~gray-800 */
+  --border-light: rgb(232, 225, 225);
+  --border-dark: #1f2937;
+  /* ~gray-800 */
+  --focus-ring: #2563eb;
+  /* ~blue-600 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,11 +26,28 @@
   }
 }
 
+/* ───────────────────────────────
+   Base
+─────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Lock page scroll when drawer is open (toggled by JS) */
+body.nav-open {
+  overflow: hidden;
+}
+
+/* If you use Tailwind, ensure these exist somewhere in the file: */
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
 
 /* ───────────────────────────────
    Hamburger + Drawer Navigation
@@ -33,17 +61,22 @@ body {
   /* gap-3 */
   padding: 0.75rem 1rem;
   /* py-3 px-4 */
-  border-bottom: 1px solid rgb(232, 225, 225);
-  /* border-gray-200 */
+  border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
   background-color: #ffffff;
-  z-index: 50;
+  z-index: 40;
+  /* below overlay; drawer sits above */
+  /* subtle polish */
+  backdrop-filter: saturate(180%) blur(6px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
   .nav-topbar {
     background-color: #000000;
+    border-bottom-color: var(--border-dark);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 }
 
@@ -52,7 +85,7 @@ body {
   font-weight: 600;
   /* font-semibold */
   text-decoration: none;
-  /* no-underline */
+  color: inherit;
 }
 
 /* Hamburger button */
@@ -64,7 +97,7 @@ body {
   /* w-9 */
   height: 1.75rem;
   /* h-7 */
-  background-color: transparent;
+  background: transparent;
   border: 0;
   cursor: pointer;
 }
@@ -74,11 +107,26 @@ body {
   height: 0.125rem;
   /* h-0.5 */
   background-color: currentColor;
-  /* bg-current */
   border-radius: 0.25rem;
-  /* rounded */
 }
 
+/* Overlay (covers full screen behind drawer) */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, background 200ms ease;
+  z-index: 50;
+  /* above header, below drawer */
+}
+
+.nav-overlay.show {
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* Drawer */
 .nav-drawer {
@@ -90,22 +138,30 @@ body {
   width: 18rem;
   /* w-72 */
   background-color: #ffffff;
-  /* bg-white */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  /* shadow-lg */
   transform: translateX(-100%);
   /* hidden */
-  transition: transform 300ms;
-  z-index: 50;
+  transition: transform 300ms ease;
+  z-index: 60;
+  /* above overlay */
   display: grid;
   grid-template-rows: auto 1fr;
+
+  /* Prevent hover/focus backgrounds from “bleeding” past the edge */
+  overflow: hidden;
+  border-right: 1px solid #e5e7eb;
 }
 
 @media (prefers-color-scheme: dark) {
   .nav-drawer {
     background-color: #171717;
-    /* dark:bg-neutral-900 */
+    /* ~neutral-900 */
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.7),
+      0 4px 6px -2px rgba(0, 0, 0, 0.5);
+    border-right-color: #262626;
   }
 }
 
@@ -123,14 +179,25 @@ body {
   border-bottom: 1px solid #e5e7eb;
 }
 
+@media (prefers-color-scheme: dark) {
+  .drawer-header {
+    border-bottom-color: #262626;
+  }
+}
+
 .close-btn {
   background: transparent;
   border: 0;
   font-size: 1.25rem;
   /* text-xl */
   line-height: 1;
-  /* leading-none */
   cursor: pointer;
+}
+
+/* Drawer nav container
+   Contain paints to avoid blending artifacts with overlay */
+.drawer-nav {
+  contain: paint;
 }
 
 /* Root menu */
@@ -142,29 +209,43 @@ body {
 
 .menu-root>li {
   border-bottom: 1px solid #f3f4f6;
-  /* border-gray-100 */
+  /* gray-100 */
 }
 
 @media (prefers-color-scheme: dark) {
   .menu-root>li {
-    border-bottom: 1px solid #262626;
-    /* dark:border-gray-800 */
+    border-bottom-color: #262626;
   }
 }
 
+/* Make links fill the drawer width and stay clipped inside */
 .menu-root a,
 .menu-root summary {
   display: flex;
+  /* keeps label + arrow spaced */
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
   /* gap-2 */
   width: 100%;
+  box-sizing: border-box;
+  /* padding stays inside width */
   padding: 0.75rem 1rem;
   /* px-4 py-3 */
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+}
+
+/* Hover colors (top-level) */
+.menu-root a:hover {
+  background: var(--hover-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .menu-root a:hover {
+    background: var(--hover-bg-dark);
+  }
 }
 
 /* Submenu */
@@ -174,9 +255,9 @@ body {
 
 .has-sub summary::-webkit-details-marker {
   display: none;
-  /* Safari */
 }
 
+/* Safari */
 .arrow {
   transition: transform 150ms;
 }
@@ -193,14 +274,36 @@ body {
 
 .submenu li a {
   display: block;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.5rem 1.75rem;
   /* px-7 py-2 */
   font-size: 0.875rem;
   /* text-sm */
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
-/* Hover-to-open behavior on desktop */
+.submenu li a:hover {
+  background: var(--hover-bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .submenu li a:hover {
+    background: var(--hover-bg-dark);
+  }
+}
+
+/* Keyboard focus visibility */
+.hamburger:focus-visible,
+.close-btn:focus-visible,
+.drawer-nav a:focus-visible,
+.drawer-nav summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Hover-to-open behavior on desktop (keeps your pattern) */
 @media (hover: hover) and (pointer: fine) {
   .has-sub:hover details:not([open]) .submenu {
     display: block;
