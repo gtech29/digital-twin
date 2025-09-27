@@ -47,3 +47,5 @@ If you’ve read this far—thank you, I truly appreciate your time and interest
 - Got ideas? Contributions and discussions are welcome.  
 - Reach out with questions or suggestions.  
 - This is a work in progress, and updates will be shared along the way.  
+- I leverage AI tools as coding assistants to accelerate implementation, while focusing my effort on system architecture, integration, and problem-solving.
+- This approach lets me build complex systems efficiently while ensuring I understand and control every component.
